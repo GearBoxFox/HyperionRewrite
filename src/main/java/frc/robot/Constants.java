@@ -78,11 +78,11 @@ public final class Constants
     }
 
     public static class AutoConstants {
-        public static PIDController XController = new PIDController(1.0, 0.0, 0.0);
-        public static PIDController YController = new PIDController(1.0, 0.0, 0.0);
-        public static PIDController ThetaController = new PIDController(1.0, 0.0, 0.0);
+        public static PIDController XController = new PIDController(2.0, 0.0, 0.0);
+        public static PIDController YController = new PIDController(2.0, 0.0, 0.0);
+        public static PIDController ThetaController = new PIDController(2.5, 0.0, 0.001);
 
-        public static PIDConstants TranslationConstants = new PIDConstants(0.25, 0.0, 0.0);
-        public static PIDConstants RotationConstants = new PIDConstants(1.0, 0.0, 0.0);
+        public static PIDConstants TranslationConstants = new PIDConstants(1.0, 0.0, 0.001);
+        public static PIDConstants RotationConstants = new PIDConstants(2.0, 0.0, 0.001);
     }
 }

@@ -12,11 +12,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.auto.FollowPathCommand;
+import frc.robot.auto.FollowPathWithEventsCommand;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
+
+import java.util.HashMap;
 
 
 /**
@@ -95,7 +98,11 @@ public class RobotContainer
      */
     public Command getAutonomousCommand()
     {
+        HashMap<String,Command> eventMap = new HashMap<>();
+        eventMap.put("ExtendIntake", m_intake.commandExtendIntake());
+
+
         // An example command will be run in autonomous
-        return new FollowPathCommand(m_drive, "New Path");
+        return new FollowPathWithEventsCommand(m_drive, "GetPieceFromNodePos", eventMap);
     }
 }

@@ -27,7 +27,7 @@ public class FollowPathCommand extends CommandBase {
         this.swerveDrivetrain = swerveDrivetrain;
         // each subsystem used by the command must be passed into the
         // addRequirements() method (which takes a vararg of Subsystem)
-        constraints = new PathConstraints(Constants.ModuleConstants.L1_MAX_SPEED_MPS, Constants.ModuleConstants.L1_MAX_SPEED_MPS);
+        constraints = new PathConstraints(Constants.ModuleConstants.L1_MAX_SPEED_MPS / 2, Constants.ModuleConstants.L1_MAX_SPEED_MPS / 2);
         traj = PathPlanner.loadPath(pathname, constraints);
 
         if (traj == null) {

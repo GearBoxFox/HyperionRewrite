@@ -5,7 +5,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -37,5 +40,13 @@ public class Intake extends SubsystemBase {
 
     public void stopMagazine() {
         m_indexer.set(ControlMode.PercentOutput, 0.0);
+    }
+
+    public CommandBase commandExtendIntake(){
+        return runEnd(this::extend, this::retract);
+    }
+
+    public CommandBase commandRetractIntake() {
+        return run(this::retract);
     }
 }

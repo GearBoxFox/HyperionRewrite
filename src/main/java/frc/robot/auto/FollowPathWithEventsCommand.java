@@ -5,20 +5,29 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.PathPlannerFlipper;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrivetrain;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class FollowPathWithEventsCommand extends CommandBase {
 
     private SwerveDrivetrain m_swerve;
+
+    private Intake m_intake;
     private SwerveAutoBuilder m_swerveBuilder;
-    private PathPlannerTrajectory traj;
+    private List<PathPlannerTrajectory> traj;
+
+    private final Map<String,Command> m_autoEventMap;
     private boolean isFinished = false;
     public FollowPathWithEventsCommand(SwerveDrivetrain swerve, String pathName, Map<String, Command> eventMap) {
+        m_autoEventMap = eventMap;
         m_swerve = swerve;
         m_swerveBuilder = new SwerveAutoBuilder(
                 swerve::getPose,
@@ -32,7 +41,7 @@ public class FollowPathWithEventsCommand extends CommandBase {
                 swerve
         );
 
-        traj = PathPlanner.loadPath(pathName, Constants.ModuleConstants.L1_MAX_SPEED_MPS, Constants.ModuleConstants.L1_MAX_SPEED_MPS);
+        traj = PathPlanner.loadPathGroup(pathName, Constants.ModuleConstants.L1_MAX_SPEED_MPS / 2, Constants.ModuleConstants.L1_MAX_SPEED_MPS / 2);
         traj = PathPlannerFlipper.flipTrajectory(traj);
 
         // each subsystem used by the command must be passed into the
@@ -54,9 +63,7 @@ public class FollowPathWithEventsCommand extends CommandBase {
      */
     @Override
     public void execute() {
-        Command controllerCommand = m_swerveBuilder.followPath(traj);
-        controllerCommand.execute();
-        isFinished = controllerCommand.isFinished();
+        CommandScheduler.getInstance().schedule(m_swerve.getAutoBuilder(m_autoEventMap).fullAuto(traj));
     }
 
     /**
@@ -76,7 +83,7 @@ public class FollowPathWithEventsCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return false;
+        return true;
     }
 
     /**
@@ -89,6 +96,5 @@ public class FollowPathWithEventsCommand extends CommandBase {
      */
     @Override
     public void end(boolean interrupted) {
-        m_swerve.drive(0.0, 0.0, 0.0);
     }
 }
