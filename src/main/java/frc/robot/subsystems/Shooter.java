@@ -36,8 +36,8 @@ public class Shooter extends SubsystemBase {
         m_right.setInverted(InvertType.InvertMotorOutput);
         m_kicker.setInverted(true);
 
-        m_right.config_kP(0, 0.2574);
-        m_left.config_kP(0, 0.2574);
+        m_right.config_kP(0, 0.05);
+        m_left.config_kP(0, 0.05);
 
         m_ff = new SimpleMotorFeedforward(0.190, 0.228, 0.0);
     }
@@ -49,12 +49,12 @@ public class Shooter extends SubsystemBase {
     }
 
     public void runFlywheel() {
-        double output = SmartDashboard.getNumber("Shooter RPM", 2000);
-        double arbOutput = m_ff.calculate(2000);
+        double output = 2500;// SmartDashboard.getNumber("Shooter RPM", 1200);
+//        double arbOutput = m_ff.calculate(1200);
 //        arbOutput = 0.0;
 
-        m_right.set(ControlMode.Velocity, Utils.RPMToFalcon(output, 1.0), DemandType.ArbitraryFeedForward, arbOutput);
-        m_left.set(TalonFXControlMode.Velocity, Utils.RPMToFalcon(output, 1.0), DemandType.ArbitraryFeedForward, arbOutput);
+        m_right.set(ControlMode.Velocity, Utils.RPMToFalcon(output, 1.0));//, DemandType.ArbitraryFeedForward, arbOutput);
+        m_left.set(TalonFXControlMode.Velocity, Utils.RPMToFalcon(output, 1.0));//, DemandType.ArbitraryFeedForward, arbOutput);
     }
 
     public void runKicker() {
