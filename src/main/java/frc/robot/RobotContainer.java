@@ -28,6 +28,7 @@ public class RobotContainer
     private final SwerveDrivetrain m_drive = new SwerveDrivetrain();
     private final Intake m_intake = new Intake();
     private final Shooter m_shooter = new Shooter();
+    private int shooterpower = 20;
     
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController =
