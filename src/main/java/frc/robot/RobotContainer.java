@@ -5,15 +5,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.auto.FollowPathCommand;
+import frc.robot.auto.FollowPathWithEventsCommand;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrivetrain;
+import frc.robot.subsystems.TurretSubsystem;
+
+import java.util.HashMap;
 
 
 /**
@@ -28,7 +34,13 @@ public class RobotContainer
     private final SwerveDrivetrain m_drive = new SwerveDrivetrain();
     private final Intake m_intake = new Intake();
     private final Shooter m_shooter = new Shooter();
+
+    private final TurretSubsystem m_turret = new TurretSubsystem();
+
+    private final PneumaticHub ph = new PneumaticHub(2);
+
     private int shooterpower = 20;
+
     
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController =
@@ -38,6 +50,7 @@ public class RobotContainer
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer()
     {
+        ph.enableCompressorDigital();
         // Configure the trigger bindings
         configureBindings();
     }
@@ -61,14 +74,24 @@ public class RobotContainer
         m_drive.setDefaultCommand(new Drive(m_drive, driverController));
 
         driverController.x()
+                .and(driverController.y().negate())
                 .whileTrue(new InstantCommand(m_intake::extend))
                 .whileFalse(new InstantCommand(m_intake::retract));
+
         driverController.y()
-                .or(driverController.b())
-                .whileTrue(new InstantCommand(m_shooter::shoot))
+                .and(driverController.x().negate())
+                .whileTrue(new InstantCommand(m_shooter::runFlywheel))
                 .whileFalse(new InstantCommand(m_shooter::stop));
+
         driverController.y()
-                .whileTrue(new InstantCommand(m_intake::runMagazine));
+                .and(driverController.x())
+                .whileTrue(new InstantCommand(m_intake::runMagazine).alongWith(new InstantCommand(m_shooter::shoot)))
+                .whileFalse(new InstantCommand(m_intake::stopMagazine).alongWith(new InstantCommand(m_shooter::stop)));
+
+        driverController.start().onTrue(m_drive.resetGyroBase());
+//        driverController.rightBumper()
+//                .whileTrue(m_turret.trackTargetFactory())
+//                .whileFalse(m_turret.stopTurretFactory());
     }
     
     
@@ -79,7 +102,11 @@ public class RobotContainer
      */
     public Command getAutonomousCommand()
     {
+        HashMap<String,Command> eventMap = new HashMap<>();
+        eventMap.put("ExtendIntake", m_intake.commandExtendIntake());
+
+
         // An example command will be run in autonomous
-        return new InstantCommand();
+        return new FollowPathWithEventsCommand(m_drive, "GetPieceFromNodePos", eventMap);
     }
 }
