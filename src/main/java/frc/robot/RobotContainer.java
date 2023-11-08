@@ -89,9 +89,9 @@ public class RobotContainer
                 .whileFalse(new InstantCommand(m_intake::stopMagazine).alongWith(new InstantCommand(m_shooter::stop)));
 
         driverController.start().onTrue(m_drive.resetGyroBase());
-//        driverController.rightBumper()
-//                .whileTrue(m_turret.trackTargetFactory())
-//                .whileFalse(m_turret.stopTurretFactory());
+        driverController.rightBumper()
+                .whileTrue(m_turret.trackTargetFactory())
+                .whileFalse(m_turret.stopTurretFactory());
     }
     
     

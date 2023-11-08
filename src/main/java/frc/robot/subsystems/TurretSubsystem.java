@@ -47,7 +47,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        // Log dashboard data
+        SmartDashboard.putNumber("Measured Angle", getTurretAngle());
+        SmartDashboard.putNumber("Raw Encoder Reading", m_turret.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Limelight Angle", m_limelight.limelightAngle());
     }
 
     public void setTurretPower(double power) {
@@ -57,22 +60,22 @@ public class TurretSubsystem extends SubsystemBase {
             power = 0;
         } else if (turretAngle > maxAngle && power > 0) {
             power = 0;
+        } else {
+            power = MathUtil.clamp(power, -0.25, 0.25);
+            SmartDashboard.putNumber("Actual Output", power);
+
+            m_turret.set(ControlMode.PercentOutput, power);
         }
-
-        power = MathUtil.clamp(power, -0.25, 0.25);
-        SmartDashboard.putNumber("Actual Output", power);
-
-        m_turret.set(ControlMode.PercentOutput, power);
     }
 
     public void trackTarget() {
         // Calculate output based on limelight data
         double limelightAngle = m_limelight.limelightAngle();
-        setTurretAngle(limelightAngle);
+        double output = m_pid.calculate(limelightAngle, 0);
     }
 
     public void setTurretAngle(double inputAngle) {
-        double turretAngle = Utils.falconToDegrees4096(m_turret.getSelectedSensorPosition(), m_gearRatio);
+        double turretAngle = getTurretAngle();
         double output = m_pid.calculate(turretAngle, inputAngle);
 
         // Log dashboard data
@@ -83,6 +86,10 @@ public class TurretSubsystem extends SubsystemBase {
         if (turretEnabled) {
             setTurretPower(output);
         }
+    }
+
+    public double getTurretAngle() {
+        return Utils.falconToDegrees4096(m_turret.getSelectedSensorPosition(), m_gearRatio);
     }
 
     public CommandBase trackTargetFactory() {
